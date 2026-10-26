@@ -164,7 +164,7 @@
   checkSprites();
 
   function buildMap() {
-    var w = 22;
+    var w = 50;
     var h = 12;
     var ground = h - 1;
     var grid = [];
@@ -176,12 +176,22 @@
       grid.push(row);
     }
     for (x = 0; x < w; x++) grid[ground][x] = "#";
-    [9, 12].forEach(function (col) { grid[ground][col] = "."; });
+    [9, 14, 19, 27, 33, 39].forEach(function (col) { grid[ground][col] = "."; });
+    function fill(x0, x1, top) {
+      var col;
+      var row;
+      for (col = x0; col <= x1; col++) {
+        for (row = top; row <= ground; row++) grid[row][col] = "#";
+      }
+    }
+    fill(22, 24, ground - 1);
+    fill(30, 32, ground - 1);
+    fill(36, 38, ground - 1);
     grid[ground][2] = "t";
-    grid[ground][20] = "t";
+    grid[ground][42] = "t";
     grid[ground - 1][3] = "P";
-    grid[ground - 1][19] = "D";
-    grid[ground - 1][21] = "R";
+    grid[ground - 1][47] = "D";
+    grid[ground - 1][49] = "R";
     return grid.map(function (line) { return line.join(""); });
   }
 
@@ -270,7 +280,7 @@
       reduce: false,
       fireSkill: false,
       flame: { x: 10 * TILE + 2, y: groundTop - 44, w: 20, h: 44 },
-      lamps: [11, 13, 14].map(function (col) {
+      lamps: [12, 26, 40].map(function (col) {
         return { x: col * TILE + 4, y: groundTop - 20, w: 8, h: 18, lit: false };
       }),
       events: []
