@@ -1,7 +1,7 @@
 {
   "name": "Dragon Slayer: D2",
   "short_name": "Dragon Slayer: D2",
-  "description": "A short game. Play it through.",
+  "description": "Be a part of the adventure",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#1a0c16",
