@@ -55,8 +55,8 @@
     var on = prefersSound();
     var button = $("sound");
     button.setAttribute("aria-pressed", on ? "true" : "false");
-    button.setAttribute("aria-label", on ? "Sound on" : "Sound off");
-    button.textContent = on ? "SFX" : "OFF";
+    button.setAttribute("aria-label", on ? "Sound effects on" : "Sound effects off");
+    button.textContent = on ? "SFX ON" : "SFX OFF";
   }
 
   function tone(freq, dur, type, slide) {

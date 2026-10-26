@@ -164,7 +164,7 @@
   checkSprites();
 
   function buildMap() {
-    var w = 108;
+    var w = 22;
     var h = 12;
     var ground = h - 1;
     var grid = [];
@@ -176,25 +176,12 @@
       grid.push(row);
     }
     for (x = 0; x < w; x++) grid[ground][x] = "#";
-    [14, 29, 44, 59, 86].forEach(function (col) { grid[ground][col] = "."; });
-    [10, 25, 38, 52, 66].forEach(function (col) { grid[ground - 1][col] = "#"; });
-    function fill(x0, x1, top) {
-      var col;
-      var row;
-      for (col = x0; col <= x1; col++) {
-        for (row = top; row <= ground; row++) grid[row][col] = "#";
-      }
-    }
-    fill(18, 21, ground - 1);
-    fill(33, 35, ground - 1);
-    fill(70, 72, ground - 1);
-    fill(73, 77, ground - 2);
-    fill(78, 80, ground - 1);
-    grid[ground][8] = "t";
-    grid[ground][94] = "t";
+    [9, 12].forEach(function (col) { grid[ground][col] = "."; });
+    grid[ground][2] = "t";
+    grid[ground][20] = "t";
     grid[ground - 1][3] = "P";
-    grid[ground - 1][96] = "D";
-    grid[ground - 1][99] = "R";
+    grid[ground - 1][19] = "D";
+    grid[ground - 1][21] = "R";
     return grid.map(function (line) { return line.join(""); });
   }
 
@@ -282,8 +269,8 @@
       flags: {},
       reduce: false,
       fireSkill: false,
-      flame: { x: 60 * TILE + 2, y: groundTop - 44, w: 20, h: 44 },
-      lamps: [62, 65, 68].map(function (col) {
+      flame: { x: 10 * TILE + 2, y: groundTop - 44, w: 20, h: 44 },
+      lamps: [11, 13, 14].map(function (col) {
         return { x: col * TILE + 4, y: groundTop - 20, w: 8, h: 18, lit: false };
       }),
       events: []
