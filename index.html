@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0c16">
+  <meta name="description" content="A short game. Play it through.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Dragon Slayer: D2">
+  <meta property="og:title" content="Dragon Slayer: D2">
+  <meta property="og:description" content="A short game. Play it through.">
+  <meta property="og:type" content="website">
+  <title>Dragon Slayer: D2</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%231a0c16'/%3E%3Cpath fill='%23ff4d88' d='M4 5h2V4h1v1h2V4h1v1h2v2h-1v1h-1v1H9v1H7V9H6V8H5V7H4z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    try {
+      if (localStorage.getItem("unite-revealed") === "1") {
+        document.documentElement.classList.add("is-revealed");
+      }
+    } catch (err) {}
+    try {
+      if (sessionStorage.getItem("unite-revealed") === "1") {
+        document.documentElement.classList.add("is-revealed");
+      }
+    } catch (err) {}
+  </script>
+</head>
+<body>
+  <noscript><p class="noscript">JavaScript runs this game. Turn it on to play.</p></noscript>
+  <div class="world">
+    <div class="cabinet">
+      <header class="marquee">
+        <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="kicker wedding-only">THE WEDDING OF</p>
+        <h1 class="logo">
+          <span class="logo-line game-only">Dragon Slayer: D2</span>
+          <span class="logo-line wedding-only" id="name1">Chandrima</span>
+          <span class="logo-and wedding-only">
+            <span class="sr">and</span>
+            <svg class="logo-heart" viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges">
+              <path fill="currentColor" d="M1 0h2v1H1zm5 0h2v1H6zM0 1h4v1H0zm5 0h4v1H5zM0 2h9v1H0zM1 3h7v1H1zM2 4h5v1H2zM3 5h3v1H3zM4 6h1v1H4z"/>
+            </svg>
+          </span>
+          <span class="logo-line wedding-only" id="name2">Debopriyo</span>
+        </h1>
+        <p class="tagline" id="tagline"></p>
+        <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </header>
+
+      <div class="bezel">
+        <div class="screen" id="screen">
+          <div class="hud">
+            <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Sound off">OFF</button>
+          </div>
+          <div class="stages" id="stages">
+            <section class="stage stage-play" id="title" aria-label="Play">
+              <div class="play-field" id="play-field">
+                <div class="play-view">
+                  <canvas id="scene" width="320" height="180" aria-label="Debopriyo crosses the palace, fights the dragon, and reaches Chandrima." aria-describedby="play-help"></canvas>
+                </div>
+                <p class="sr" id="play-status" aria-live="polite">Chandrima and Debopriyo were walking together.</p>
+                <p class="sr" id="play-help">Run with the arrow keys, the A and D keys, or the pads. Jump with space or the jump button. After touching the palace flame, throw fire with F, J, or the fire button.</p>
+                <div class="pad" id="pad">
+                  <button type="button" id="pad-left" aria-label="Run left">&lt;</button>
+                  <button type="button" id="pad-right" aria-label="Run right">&gt;</button>
+                  <button type="button" id="pad-fire" aria-label="Throw a fireball" hidden>FIRE</button>
+                  <button type="button" id="pad-jump" aria-label="Jump">JUMP</button>
+                </div>
+                <div class="endings" id="endings" hidden>
+                  <button type="button" id="try-again">Try Again</button>
+                  <button type="button" id="open-invite" aria-label="Open the wedding invite" hidden>THE INVITE</button>
+                  <button type="button" id="repent" aria-label="Skip the game and open the invite">SKIP</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="stage wedding-only" id="story" aria-label="Invite">
+              <div class="dialog">
+                <p class="plate-kicker">AN INVITE</p>
+                <div id="story-copy"></div>
+                <p class="body formal-note">Formal invitation to follow.</p>
+              </div>
+            </section>
+
+            <section class="stage wedding-only" id="party" aria-label="Days">
+              <div class="dialog">
+                <p class="plate-kicker">THE DAYS</p>
+                <dl id="party-facts"></dl>
+                <a class="big-link" id="map-link" hidden target="_blank" rel="noopener noreferrer">OPEN MAP</a>
+                <p class="body" id="party-note"></p>
+              </div>
+            </section>
+
+            <section class="stage wedding-only" id="rsvp" aria-label="RSVP">
+              <div class="dialog">
+                <p class="plate-kicker">RSVP</p>
+                <div id="rsvp-slot"></div>
+              </div>
+            </section>
+          </div>
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="glare" aria-hidden="true"></div>
+          <div class="alert" id="alert" role="status">
+            <p class="alert-kicker">NOTE</p>
+            <p id="alert-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="deck">
+        <nav class="nav wedding-only" aria-label="Stages">
+          <button class="arrow" id="prev" type="button" aria-label="Previous stage">&lt;</button>
+          <div class="nav-mid">
+            <p class="nav-label"><span class="nav-index" id="nav-index">1/4</span><span id="nav-name">Play</span></p>
+            <div class="dots" id="dots">
+              <button class="dot" type="button" data-stage="0" aria-label="Play" aria-current="true"></button>
+              <button class="dot wedding-only" type="button" data-stage="1" aria-label="Invite"></button>
+              <button class="dot wedding-only" type="button" data-stage="2" aria-label="The days"></button>
+              <button class="dot wedding-only" type="button" data-stage="3" aria-label="RSVP"></button>
+            </div>
+          </div>
+          <button class="arrow" id="next" type="button" aria-label="Next stage">&gt;</button>
+        </nav>
+        <button class="save-btn wedding-only" id="save" type="button">
+          <span class="save-label">SAVE THE DATE</span>
+        </button>
+        <p class="hint wedding-only" id="save-hint">Adds the wedding to your calendar</p>
+      </footer>
+    </div>
+  </div>
+  <p class="sr" id="stage-announcer" aria-live="polite"></p>
+  <script src="config.js"></script>
+  <script src="calendar.js"></script>
+  <script src="play.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
