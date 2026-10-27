@@ -85,6 +85,7 @@ img, canvas { display: block; }
   background: var(--gold);
   border: 2px solid var(--ink);
   text-shadow: none;
+  white-space: nowrap;
 }
 
 .sound::after {
@@ -259,14 +260,12 @@ html.is-revealed .game-only { display: none !important; }
 .stage::-webkit-scrollbar { width: 8px; }
 .stage::-webkit-scrollbar-thumb { background: #5a3048; }
 
-#story,
-#party {
+#story {
   display: flex;
   flex-direction: column;
 }
 
-#story .dialog,
-#party .dialog {
+#story .dialog {
   margin: auto 0;
 }
 
@@ -385,7 +384,6 @@ html.is-revealed .game-only { display: none !important; }
 }
 
 .plate-kicker,
-.fact dt,
 .field-label,
 .nav-index {
   margin: 0;
@@ -410,12 +408,6 @@ html.is-revealed .game-only { display: none !important; }
   color: var(--cream);
 }
 
-#party-note {
-  margin: 4px 0 0;
-  font-size: 22px;
-  line-height: 1;
-}
-
 .formal-note {
   margin: 10px 0 0;
   padding-top: 8px;
@@ -423,16 +415,6 @@ html.is-revealed .game-only { display: none !important; }
   color: var(--gold);
   font-size: 22px;
   line-height: 1.05;
-}
-
-.fact { margin-top: 8px; }
-
-.fact dd {
-  margin: 2px 0 0;
-  font-size: clamp(24px, 6.4vw, 32px);
-  line-height: 1.05;
-  color: var(--cream);
-  white-space: pre-line;
 }
 
 .scanlines,

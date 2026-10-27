@@ -1,6 +1,6 @@
 (function () {
-  var STAGES = ["title", "story", "party", "rsvp"];
-  var STAGE_NAMES = ["Play", "Invite", "Days", "RSVP"];
+  var STAGES = ["title", "story", "rsvp"];
+  var STAGE_NAMES = ["Play", "Invite", "RSVP"];
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var index = 0;
   var audioCtx = null;
@@ -16,7 +16,7 @@
 
   function prefersSound() {
     try {
-      return localStorage.getItem("arcade-sound") === "on";
+      return localStorage.getItem("arcade-audio") === "on";
     } catch (err) {
       return false;
     }
@@ -24,7 +24,7 @@
 
   function rememberSound(on) {
     try {
-      localStorage.setItem("arcade-sound", on ? "on" : "off");
+      localStorage.setItem("arcade-audio", on ? "on" : "off");
     } catch (err) {}
   }
 
@@ -55,8 +55,8 @@
     var on = prefersSound();
     var button = $("sound");
     button.setAttribute("aria-pressed", on ? "true" : "false");
-    button.setAttribute("aria-label", on ? "Sound effects on" : "Sound effects off");
-    button.textContent = on ? "SFX ON" : "SFX OFF";
+    button.setAttribute("aria-label", on ? "Audio on" : "Audio off");
+    button.textContent = on ? "AUDIO ON" : "AUDIO OFF";
   }
 
   function tone(freq, dur, type, slide) {
@@ -72,7 +72,7 @@
     osc.frequency.setValueAtTime(freq, t);
     if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(60, freq + slide), t + dur);
     gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.07, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.1, t + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     osc.connect(gain).connect(audioCtx.destination);
     osc.start(t);
@@ -95,8 +95,14 @@
   }
 
   function breath() {
-    tone(190, 0.16, "sawtooth", 210);
-    tone(460, 0.07, "square", 70);
+    tone(120, 0.24, "sawtooth", 110);
+    setTimeout(function () { tone(70, 0.22, "sawtooth", -20); }, 50);
+  }
+
+  function firework() {
+    tone(95, 0.18, "sawtooth", -35);
+    setTimeout(function () { tone(1050, 0.04, "square", 280); }, 110);
+    setTimeout(function () { tone(1560, 0.05, "square", -160); }, 160);
   }
 
   function fanfare() {
@@ -120,7 +126,7 @@
   }
 
   function updateNav() {
-    $("nav-index").textContent = (index + 1) + "/4";
+    $("nav-index").textContent = (index + 1) + "/3";
     $("nav-name").textContent = STAGE_NAMES[index];
     Array.prototype.forEach.call(document.querySelectorAll(".dot"), function (dot, i) {
       if (i === index) dot.setAttribute("aria-current", "true");
@@ -150,9 +156,9 @@
   }
 
   function handlePlayEvent(name) {
-    if (name === "jump") tone(640, 0.06, "square", 180);
-    if (name === "fire") tone(480, 0.05, "square", 140);
-    if (name === "hit") tone(760, 0.06, "square", 180);
+    if (name === "jump") tone(520, 0.09, "square", 240);
+    if (name === "fire") tone(900, 0.06, "square", -560);
+    if (name === "hit") tone(990, 0.05, "square", 200);
     if (name === "roar") roar();
     if (name === "boss") {
       tone(98, 0.28, "sawtooth", 30);
@@ -162,6 +168,7 @@
     if (name === "breath") breath();
     if (name === "learn") tone(880, 0.09, "square", 150);
     if (name === "spark") tone(990, 0.04, "square", 90);
+    if (name === "firework") firework();
     if (name === "kindle") {
       tone(660, 0.09, "square", 120);
       setTimeout(function () { tone(880, 0.09, "square", 120); }, 90);
@@ -290,31 +297,10 @@
     });
   }
 
-  function addFact(dl, term, value) {
-    var wrap = document.createElement("div");
-    wrap.className = "fact";
-    var dt = document.createElement("dt");
-    dt.textContent = term;
-    var dd = document.createElement("dd");
-    dd.textContent = value;
-    wrap.append(dt, dd);
-    dl.appendChild(wrap);
-  }
-
-  function fillParty() {
-    var dl = $("party-facts");
-    dl.replaceChildren();
+  function fillMap() {
     var built = WeddingCalendar.build(pageInput());
-    if (!built.ok) addFact(dl, "WEDDING", "COMING SOON");
-    else {
-      if (built.cocktailLabel) addFact(dl, "COCKTAIL", built.cocktailLabel + "\nEVENING");
-      addFact(dl, "WEDDING", built.dateLabel + (built.timeLabel ? "\n" + built.timeLabel : "\nALL DAY"));
-    }
-    addFact(dl, "WHERE", built.ok && built.location ? built.location : "COMING SOON");
-    if ((WEDDING.dressCode || "").trim()) addFact(dl, "GEAR", WEDDING.dressCode.trim());
-    if ((WEDDING.note || "").trim()) addFact(dl, "NOTE", WEDDING.note.trim());
-
     var map = $("map-link");
+    if (!map) return;
     var mapHref = safeHttpUrl(WEDDING.mapUrl);
     if (!mapHref && built.ok && built.location) {
       mapHref = "https://maps.google.com/?q=" + encodeURIComponent(built.location);
@@ -324,15 +310,7 @@
       map.href = mapHref;
     } else {
       map.hidden = true;
-    }
-
-    var note = $("party-note");
-    if (!built.ok) {
-      note.hidden = false;
-      note.textContent = "The date will show up on this screen first.";
-    } else {
-      note.hidden = true;
-      note.textContent = "";
+      map.removeAttribute("href");
     }
   }
 
@@ -751,7 +729,7 @@
     });
     renderDate();
     fillStory();
-    fillParty();
+    fillMap();
     fillRsvp();
     bind();
     var start = 0;

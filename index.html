@@ -67,7 +67,7 @@
       <div class="bezel">
         <div class="screen" id="screen">
           <div class="hud">
-            <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Sound off">OFF</button>
+            <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Audio off">AUDIO OFF</button>
           </div>
           <div class="stages" id="stages">
             <section class="stage stage-play" id="title" aria-label="Play">
@@ -96,15 +96,7 @@
                 <p class="plate-kicker">AN INVITE</p>
                 <div id="story-copy"></div>
                 <p class="body formal-note">Formal invitation to follow.</p>
-              </div>
-            </section>
-
-            <section class="stage wedding-only" id="party" aria-label="Days">
-              <div class="dialog">
-                <p class="plate-kicker">THE DAYS</p>
-                <dl id="party-facts"></dl>
                 <a class="big-link" id="map-link" hidden target="_blank" rel="noopener noreferrer">OPEN MAP</a>
-                <p class="body" id="party-note"></p>
               </div>
             </section>
 
@@ -128,12 +120,11 @@
         <nav class="nav wedding-only" aria-label="Stages">
           <button class="arrow" id="prev" type="button" aria-label="Previous stage">&lt;</button>
           <div class="nav-mid">
-            <p class="nav-label"><span class="nav-index" id="nav-index">1/4</span><span id="nav-name">Play</span></p>
+            <p class="nav-label"><span class="nav-index" id="nav-index">1/3</span><span id="nav-name">Play</span></p>
             <div class="dots" id="dots">
               <button class="dot" type="button" data-stage="0" aria-label="Play" aria-current="true"></button>
               <button class="dot wedding-only" type="button" data-stage="1" aria-label="Invite"></button>
-              <button class="dot wedding-only" type="button" data-stage="2" aria-label="The days"></button>
-              <button class="dot wedding-only" type="button" data-stage="3" aria-label="RSVP"></button>
+              <button class="dot wedding-only" type="button" data-stage="2" aria-label="RSVP"></button>
             </div>
           </div>
           <button class="arrow" id="next" type="button" aria-label="Next stage">&gt;</button>

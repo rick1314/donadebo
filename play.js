@@ -1344,6 +1344,7 @@
         });
       }
       fireworks.push({ x: cx, y: cy, color: shellColor, flash: 0.2, particles: particles });
+      emit("firework");
     }
 
     function updateFireworks(dt) {
