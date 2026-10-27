@@ -4,6 +4,7 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var index = 0;
   var audioCtx = null;
+  var audioMaster = null;
   var alertTimer = 0;
   var saveLock = false;
   var playApi = null;
@@ -59,61 +60,92 @@
     button.textContent = on ? "AUDIO ON" : "AUDIO OFF";
   }
 
-  function tone(freq, dur, type, slide) {
-    if (!prefersSound()) return;
+  function audioBus() {
     var Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return;
-    if (!audioCtx) audioCtx = new Ctx();
+    if (!Ctx) return null;
+    if (!audioCtx) {
+      audioCtx = new Ctx();
+      audioMaster = audioCtx.createGain();
+      audioMaster.gain.value = 0.65;
+
+      var softener = audioCtx.createBiquadFilter();
+      softener.type = "lowpass";
+      softener.frequency.value = 2600;
+      softener.Q.value = 0.15;
+
+      var compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -18;
+      compressor.knee.value = 24;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.01;
+      compressor.release.value = 0.25;
+
+      audioMaster.connect(softener);
+      softener.connect(compressor);
+      compressor.connect(audioCtx.destination);
+    }
     if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioMaster;
+  }
+
+  function tone(freq, dur, type, slide, vol) {
+    if (!prefersSound()) return;
+    var out = audioBus();
+    if (!out) return;
     var t = audioCtx.currentTime;
     var osc = audioCtx.createOscillator();
     var gain = audioCtx.createGain();
-    osc.type = type || "square";
-    osc.frequency.setValueAtTime(freq, t);
-    if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(60, freq + slide), t + dur);
+    var start = Math.max(90, Math.min(1600, freq));
+    osc.type = type || "triangle";
+    osc.frequency.setValueAtTime(start, t);
+    if (slide) {
+      var end = Math.max(80, Math.min(1600, start + slide));
+      osc.frequency.exponentialRampToValueAtTime(end, t + dur);
+    }
+    var level = Math.max(0.01, Math.min(0.12, vol || 0.06));
     gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.1, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(level, t + 0.025);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    osc.connect(gain).connect(audioCtx.destination);
+    osc.connect(gain).connect(out);
     osc.start(t);
-    osc.stop(t + dur + 0.02);
+    osc.stop(t + dur + 0.05);
   }
 
   function coin() {
-    tone(880, 0.07, "square", 220);
-    setTimeout(function () { tone(1320, 0.1, "square", 0); }, 70);
+    tone(740, 0.09, "sine", 0, 0.05);
+    setTimeout(function () { tone(988, 0.12, "sine", 0, 0.05); }, 80);
   }
 
   function roar() {
-    tone(72, 0.42, "sawtooth", 48);
-    setTimeout(function () { tone(108, 0.32, "square", -36); }, 90);
+    tone(90, 0.38, "triangle", 30, 0.05);
+    setTimeout(function () { tone(135, 0.3, "sine", -30, 0.04); }, 90);
   }
 
   function snatch() {
-    tone(640, 0.14, "square", -380);
-    setTimeout(function () { tone(150, 0.28, "sawtooth", -60); }, 100);
+    tone(620, 0.16, "sine", -300, 0.045);
+    setTimeout(function () { tone(180, 0.3, "triangle", -40, 0.04); }, 100);
   }
 
   function breath() {
-    tone(120, 0.24, "sawtooth", 110);
-    setTimeout(function () { tone(70, 0.22, "sawtooth", -20); }, 50);
+    tone(150, 0.3, "triangle", 60, 0.045);
+    setTimeout(function () { tone(90, 0.26, "sine", -20, 0.04); }, 60);
   }
 
   function firework() {
-    tone(95, 0.18, "sawtooth", -35);
-    setTimeout(function () { tone(1050, 0.04, "square", 280); }, 110);
-    setTimeout(function () { tone(1560, 0.05, "square", -160); }, 160);
+    tone(120, 0.2, "sine", -30, 0.04);
+    setTimeout(function () { tone(1046, 0.04, "sine", 280, 0.02); }, 110);
+    setTimeout(function () { tone(1568, 0.04, "sine", -120, 0.015); }, 160);
   }
 
   function fanfare() {
-    tone(523, 0.12, "square", 0);
-    setTimeout(function () { tone(659, 0.12, "square", 0); }, 140);
-    setTimeout(function () { tone(784, 0.14, "square", 0); }, 280);
-    setTimeout(function () { tone(1046, 0.32, "square", 30); }, 430);
+    tone(523, 0.12, "triangle", 0, 0.05);
+    setTimeout(function () { tone(659, 0.12, "triangle", 0, 0.05); }, 140);
+    setTimeout(function () { tone(784, 0.14, "triangle", 0, 0.05); }, 280);
+    setTimeout(function () { tone(1046, 0.32, "triangle", 30, 0.05); }, 430);
   }
 
   function buzz() {
-    tone(110, 0.18, "sawtooth", -40);
+    tone(100, 0.16, "triangle", -30, 0.04);
   }
 
   function showAlert(message) {
@@ -156,28 +188,28 @@
   }
 
   function handlePlayEvent(name) {
-    if (name === "jump") tone(520, 0.09, "square", 240);
-    if (name === "fire") tone(900, 0.06, "square", -560);
-    if (name === "hit") tone(990, 0.05, "square", 200);
+    if (name === "jump") tone(430, 0.1, "triangle", 200, 0.05);
+    if (name === "fire") tone(760, 0.08, "sine", -380, 0.045);
+    if (name === "hit") tone(980, 0.05, "sine", 180, 0.04);
     if (name === "roar") roar();
     if (name === "boss") {
-      tone(98, 0.28, "sawtooth", 30);
-      setTimeout(function () { tone(147, 0.2, "square", -20); }, 150);
+      tone(90, 0.3, "triangle", 20, 0.045);
+      setTimeout(function () { tone(130, 0.2, "sine", -20, 0.04); }, 150);
     }
     if (name === "kidnap") snatch();
     if (name === "breath") breath();
-    if (name === "learn") tone(880, 0.09, "square", 150);
-    if (name === "spark") tone(990, 0.04, "square", 90);
+    if (name === "learn") tone(880, 0.1, "sine", 150, 0.05);
+    if (name === "spark") tone(1100, 0.035, "sine", 100, 0.025);
     if (name === "firework") firework();
     if (name === "kindle") {
-      tone(660, 0.09, "square", 120);
-      setTimeout(function () { tone(880, 0.09, "square", 120); }, 90);
-      setTimeout(function () { tone(1174, 0.18, "square", 60); }, 180);
+      tone(660, 0.1, "sine", 120, 0.045);
+      setTimeout(function () { tone(880, 0.1, "sine", 120, 0.045); }, 90);
+      setTimeout(function () { tone(1174, 0.18, "sine", 60, 0.04); }, 180);
       if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
     }
     if (name === "reunion") {
-      tone(523, 0.1, "square", 0);
-      setTimeout(function () { tone(659, 0.12, "square", 0); }, 100);
+      tone(523, 0.1, "sine", 0, 0.045);
+      setTimeout(function () { tone(659, 0.12, "sine", 0, 0.045); }, 100);
     }
     if (name === "hurt" || name === "lose") buzz();
     if (name === "win") {
@@ -591,16 +623,16 @@
 
   function bind() {
     $("prev").addEventListener("click", function () {
-      tone(440, 0.05, "square", 80);
+      tone(440, 0.05, "triangle", 80, 0.03);
       goTo(index - 1);
     });
     $("next").addEventListener("click", function () {
-      tone(660, 0.05, "square", 80);
+      tone(660, 0.05, "triangle", 80, 0.03);
       goTo(index + 1);
     });
     Array.prototype.forEach.call(document.querySelectorAll(".dot"), function (dot) {
       dot.addEventListener("click", function () {
-        tone(520, 0.04, "square", 0);
+        tone(520, 0.04, "sine", 0, 0.03);
         goTo(Number(dot.getAttribute("data-stage")));
       });
     });
@@ -685,7 +717,7 @@
     });
 
     $("repent").addEventListener("click", function () {
-      tone(420, 0.08, "square", 120);
+      tone(420, 0.08, "triangle", 120, 0.035);
       reveal();
       showAlert("The invite is open. The game can wait.");
       goTo(1);
