@@ -29,12 +29,21 @@
     } catch (err) {}
   }
 
-  function rsvpAttending() {
+  function rsvpChoice() {
     try {
-      return localStorage.getItem("unite-rsvp") === "yes";
+      var value = localStorage.getItem("unite-rsvp");
+      return value === "yes" || value === "no" ? value : "";
     } catch (err) {
-      return false;
+      return "";
     }
+  }
+
+  function rsvpAttending() {
+    return rsvpChoice() === "yes";
+  }
+
+  function hasRsvpd() {
+    return rsvpChoice() !== "";
   }
 
   function rememberRsvp(going) {
@@ -358,9 +367,24 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) ? clean : "";
   }
 
+  function showRsvpDone() {
+    var slot = $("rsvp-slot");
+    slot.replaceChildren();
+    var kicker = document.querySelector("#rsvp .plate-kicker");
+    if (kicker && sheetRsvpEndpoint()) kicker.textContent = "COCKTAIL RSVP";
+    var done = document.createElement("p");
+    done.className = "body rsvp-done";
+    done.textContent = "You have RSVP'd";
+    slot.appendChild(done);
+  }
+
   function fillRsvp() {
     var slot = $("rsvp-slot");
     slot.replaceChildren();
+    if (hasRsvpd()) {
+      showRsvpDone();
+      return;
+    }
     var url = safeHttpUrl(WEDDING.rsvpUrl);
     if (url) {
       var lead = document.createElement("p");
@@ -479,6 +503,7 @@
         var sheetFields = form.querySelector(".rsvp-fields");
         if (sheetFields) sheetFields.scrollTop = 0;
         showAlert(going ? "RSVP saved. See you there." : "RSVP saved. You will be missed.");
+        showRsvpDone();
       }).catch(function () {
         buzz();
         showAlert("The desk did not answer. Try again.");
@@ -506,6 +531,7 @@
         var fields = form.querySelector(".rsvp-fields");
         if (fields) fields.scrollTop = 0;
         showAlert(going ? "RSVP saved. See you there." : "RSVP saved. You will be missed.");
+        showRsvpDone();
       }).catch(function () {
         buzz();
         showAlert("The desk did not answer. Try again.");
@@ -530,6 +556,7 @@
     rememberRsvp(going);
     showAlert("Your mail app is open. Hit send there.");
     coin();
+    showRsvpDone();
     button.disabled = false;
     button.textContent = "SEND RSVP";
   }

@@ -702,6 +702,13 @@ html.is-revealed .hint {
   line-height: 1.05;
 }
 
+.rsvp-done {
+  margin: 10px 0;
+  color: var(--gold);
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1.1;
+}
+
 #rsvp-form {
   display: flex;
   flex-direction: column;
