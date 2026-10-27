@@ -429,21 +429,12 @@
     form.innerHTML =
       '<div class="rsvp-fields">' +
       '<label class="field"><span class="field-label">YOUR NAME</span><input name="name" required maxlength="80" autocomplete="name"></label>' +
-      '<div class="field" role="radiogroup" aria-label="Your move"><span class="field-label">YOUR MOVE</span><div class="choice">' +
-      '<label class="choice-btn"><input type="radio" name="attending" value="yes" required><span>I\'M IN</span></label>' +
-      '<label class="choice-btn"><input type="radio" name="attending" value="no"><span>I\'M OUT</span></label>' +
-      "</div></div>" +
       '<label class="field" id="count-field"><span class="field-label">PARTY SIZE</span><input name="count" type="number" min="1" max="8" value="1" inputmode="numeric"></label>' +
       '<label class="field"><span class="field-label">MESSAGE</span><textarea name="message" rows="2" maxlength="400"></textarea></label>' +
       '<input class="hp" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       "</div>" +
       '<button class="send-btn" type="submit">SEND RSVP</button>';
     slot.appendChild(form);
-
-    form.addEventListener("change", function () {
-      var picked = form.querySelector('input[name="attending"]:checked');
-      $("count-field").hidden = picked && picked.value === "no";
-    });
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -455,7 +446,6 @@
     var data = new FormData(form);
     if ((data.get("_gotcha") || "").trim()) return;
     var name = String(data.get("name") || "").trim();
-    var attending = String(data.get("attending") || "");
     var message = String(data.get("message") || "").trim();
     var parsedCount = parseInt(data.get("count"), 10);
     var count = isNaN(parsedCount) ? 1 : Math.max(1, Math.min(8, parsedCount));
@@ -465,17 +455,9 @@
       form.querySelector("[name=name]").focus();
       return;
     }
-    if (attending !== "yes" && attending !== "no") {
-      showAlert("Pick I'm in or I'm out.");
-      buzz();
-      var firstChoice = form.querySelector('input[name="attending"]');
-      if (firstChoice) firstChoice.focus();
-      return;
-    }
-    var going = attending === "yes";
     var countInput = form.querySelector('[name="count"]');
     if (countInput) countInput.value = String(count);
-    var summary = name + " is " + (going ? "IN" : "OUT") + (going ? " · party of " + count : "");
+    var summary = name + " is IN · party of " + count;
     if (message) summary += "\n" + message;
 
     var sheet = sheetRsvpEndpoint();
@@ -488,21 +470,20 @@
     if (sheet) {
       var sheetData = new URLSearchParams();
       sheetData.set("name", name);
-      sheetData.set("attending", going ? "yes" : "no");
-      sheetData.set("count", going ? String(count) : "0");
+      sheetData.set("attending", "yes");
+      sheetData.set("count", String(count));
       if (message) sheetData.set("message", message);
       fetch(sheet, {
         method: "POST",
         mode: "no-cors",
         body: sheetData
       }).then(function () {
-        rememberRsvp(going);
+        rememberRsvp(true);
         coin();
         form.reset();
-        $("count-field").hidden = false;
         var sheetFields = form.querySelector(".rsvp-fields");
         if (sheetFields) sheetFields.scrollTop = 0;
-        showAlert(going ? "RSVP saved. See you there." : "RSVP saved. You will be missed.");
+        showAlert("RSVP saved. See you there.");
         showRsvpDone();
       }).catch(function () {
         buzz();
@@ -515,8 +496,8 @@
     }
 
     if (formspree) {
-      data.set("attending", going ? "yes" : "no");
-      data.set("count", going ? String(count) : "0");
+      data.set("attending", "yes");
+      data.set("count", String(count));
       data.set("_subject", "RSVP: " + name);
       fetch(formspree, {
         method: "POST",
@@ -524,13 +505,12 @@
         headers: { Accept: "application/json" }
       }).then(function (res) {
         if (!res.ok) throw new Error("bad status");
-        rememberRsvp(going);
+        rememberRsvp(true);
         coin();
         form.reset();
-        $("count-field").hidden = false;
         var fields = form.querySelector(".rsvp-fields");
         if (fields) fields.scrollTop = 0;
-        showAlert(going ? "RSVP saved. See you there." : "RSVP saved. You will be missed.");
+        showAlert("RSVP saved. See you there.");
         showRsvpDone();
       }).catch(function () {
         buzz();
@@ -553,7 +533,7 @@
     var subject = encodeURIComponent("RSVP: " + name);
     var body = encodeURIComponent(summary);
     window.location.href = "mailto:" + email + "?subject=" + subject + "&body=" + body;
-    rememberRsvp(going);
+    rememberRsvp(true);
     showAlert("Your mail app is open. Hit send there.");
     coin();
     showRsvpDone();

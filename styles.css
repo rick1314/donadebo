@@ -46,8 +46,7 @@ button {
 }
 
 button,
-.big-link,
-.choice-btn {
+.big-link {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -634,8 +633,7 @@ html.is-revealed .hint {
   .endings button:hover,
   .big-link:hover,
   .send-btn:hover,
-  .save-btn:hover,
-  .choice-btn:hover {
+  .save-btn:hover {
     filter: brightness(1.08);
   }
 
@@ -734,7 +732,6 @@ html.is-revealed .hint {
 #rsvp-form .field-label { margin-bottom: 4px; }
 #rsvp-form .field input,
 #rsvp-form .field textarea { padding: 6px 10px; }
-#rsvp-form .choice-btn { min-height: 48px; }
 
 .field input,
 .field textarea {
@@ -748,44 +745,6 @@ html.is-revealed .hint {
   border: 3px solid var(--cream);
   border-radius: 0;
 }
-
-.choice {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.choice-btn {
-  position: relative;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: var(--cream);
-  background: #241018;
-  border: 3px solid var(--cream);
-}
-
-.choice-btn input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.choice-btn input:focus-visible { outline: none; }
-
-.choice-btn:has(input:checked) {
-  background: var(--pink);
-  color: white;
-}
-
-.choice-btn:has(input:focus-visible) {
-  outline: 3px solid var(--cyan);
-  outline-offset: 2px;
-}
-
-.choice-btn:active { filter: brightness(1.12); }
 
 [hidden] { display: none !important; }
 
